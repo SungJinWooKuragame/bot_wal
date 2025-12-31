@@ -22,7 +22,7 @@ export default async function DashboardPage() {
   try {
     user = await requireAuth()
   } catch {
-    redirect("/auth/discord")
+    redirect("/api/auth/discord")
   }
 
   const licenses = await queryDb<License>("SELECT * FROM licenses WHERE user_id = ? ORDER BY created_at DESC", [

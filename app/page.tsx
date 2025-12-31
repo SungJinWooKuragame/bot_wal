@@ -1,9 +1,31 @@
 "use client"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { ShieldCheck, Zap, Lock, Server } from "lucide-react"
 
 export default function HomePage() {
+  const [isLoading, setIsLoading] = useState(true)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+  useEffect(() => {
+    fetch("/api/auth/check")
+      .then((res) => res.json())
+      .then((data) => {
+        setIsLoggedIn(data.authenticated)
+        setIsLoading(false)
+      })
+      .catch(() => setIsLoading(false))
+  }, [])
+
+  const handleLoginClick = () => {
+    if (isLoggedIn) {
+      window.location.href = "/dashboard"
+    } else {
+      window.location.href = "/api/auth/discord"
+    }
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -13,7 +35,9 @@ export default function HomePage() {
             <ShieldCheck className="h-6 w-6 text-primary" />
             <span className="font-bold text-xl">FiveM WL Bot</span>
           </div>
-          <Button onClick={() => (window.location.href = "/api/auth/discord")}>Acessar Dashboard</Button>
+          <Button onClick={handleLoginClick} disabled={isLoading}>
+            {isLoading ? "Carregando..." : isLoggedIn ? "Ir para Dashboard" : "Acessar Dashboard"}
+          </Button>
         </div>
       </header>
 
@@ -27,12 +51,12 @@ export default function HomePage() {
             Gerencie a whitelist da sua cidade FiveM com segurança, controle total e sistema de licenças moderno.
           </p>
           <div className="flex gap-4 justify-center pt-4">
-            <Button size="lg" className="gap-2" onClick={() => (window.location.href = "/api/auth/discord")}>
+            <Button size="lg" className="gap-2" onClick={handleLoginClick} disabled={isLoading}>
               <ShieldCheck className="h-5 w-5" />
-              Começar Agora
+              {isLoading ? "Carregando..." : isLoggedIn ? "Acessar Dashboard" : "Começar Agora"}
             </Button>
-            <Button size="lg" variant="outline" onClick={() => (window.location.href = "/api/auth/discord")}>
-              Ver Planos
+            <Button size="lg" variant="outline" onClick={handleLoginClick} disabled={isLoading}>
+              {isLoggedIn ? "Meu Painel" : "Ver Planos"}
             </Button>
           </div>
         </div>
