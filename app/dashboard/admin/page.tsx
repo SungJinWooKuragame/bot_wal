@@ -1,35 +1,49 @@
 import { getServerSession } from "next-auth"
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"  // Caminho pro seu authOptions
+import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { redirect } from "next/navigation"
 import { Card } from "@/components/ui/card"
 import { ShieldCheck, Plus } from "lucide-react"
 import { CreateLicenseForm } from "@/components/create-license-form"
-import { queryDb } from "@/lib/db"  // Mantém sua função de query (assumindo que funciona com MySQL)
+import { queryDb } from "@/lib/db"
 
-// Esta página é só para admin criar licenças
 export default async function AdminPage() {
   const session = await getServerSession(authOptions)
 
   if (!session?.user) {
-    redirect("/api/auth/signin?callbackUrl=/dashboard/admin")  // Redireciona pro login oficial
+    redirect("/api/auth/signin?callbackUrl=/dashboard/admin")
   }
 
-  // Busca o usuário no banco pra checar se é admin (baseado no email ou id do Discord)
-  // Ajuste conforme sua tabela users (ex: coluna discord_id ou email)
-  const [userRecord] = await queryDb<{ is_admin: boolean }>(
-    "SELECT is_admin FROM users WHERE discord_id = ? OR email = ?",
-    [session.user.id, session.user.email]
-  )
+  // Check se é admin (busca no banco pelo discord_id)
+  let isAdmin = false
+  let totalLicenses = 0
+  let activeLicenses = 0
 
-  if (!userRecord?.is_admin) {
-    redirect("/dashboard")  // Ou pra home se preferir
+  try {
+    const [userRecord] = await queryDb<{ is_admin: number }>(
+      "SELECT is_admin FROM users WHERE discord_id = ?",
+      [session.user.id]
+    )
+
+    if (userRecord?.is_admin === 1) {
+      isAdmin = true
+
+      // Stats admin
+      const total = await queryDb<{ count: number }>("SELECT COUNT(*) as count FROM licenses")
+      const active = await queryDb<{ count: number }>(
+        "SELECT COUNT(*) as count FROM licenses WHERE status = 'active'"
+      )
+
+      totalLicenses = total[0]?.count || 0
+      activeLicenses = active[0]?.count || 0
+    }
+  } catch (error) {
+    console.error("Erro no check admin ou stats:", error)
+    // Não crasha – continua com isAdmin = false
   }
 
-  // Queries pras stats
-  const totalLicenses = await queryDb<{ count: number }>("SELECT COUNT(*) as count FROM licenses")
-  const activeLicenses = await queryDb<{ count: number }>(
-    "SELECT COUNT(*) as count FROM licenses WHERE status = 'active'"
-  )
+  if (!isAdmin) {
+    redirect("/dashboard")  // Volta pro dashboard normal
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -39,6 +53,7 @@ export default async function AdminPage() {
             <ShieldCheck className="h-6 w-6 text-primary" />
             <span className="font-bold text-xl">Admin Panel</span>
           </div>
+          <span className="text-sm text-muted-foreground">{session.user.name}</span>
         </div>
       </header>
 
@@ -46,11 +61,11 @@ export default async function AdminPage() {
         <div className="grid md:grid-cols-2 gap-4">
           <Card className="p-6">
             <p className="text-sm text-muted-foreground">Total de Licenças</p>
-            <p className="text-3xl font-bold mt-2">{totalLicenses[0]?.count || 0}</p>
+            <p className="text-3xl font-bold mt-2">{totalLicenses}</p>
           </Card>
           <Card className="p-6">
             <p className="text-sm text-muted-foreground">Licenças Ativas</p>
-            <p className="text-3xl font-bold mt-2">{activeLicenses[0]?.count || 0}</p>
+            <p className="text-3xl font-bold mt-2">{activeLicenses}</p>
           </Card>
         </div>
 
