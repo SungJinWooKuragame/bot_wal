@@ -23,7 +23,7 @@ export default function HomePage() {
     if (isLoggedIn) {
       window.location.href = "/dashboard";
     } else {
-      signIn("discord", { callbackUrl: "/dashboard" });  // <--- ISSO RESOLVE!
+      signIn("discord", { callbackUrl: "/dashboard" });  // Inicia login oficial e vai direto pro dashboard após autorizar
     }
   };
 
