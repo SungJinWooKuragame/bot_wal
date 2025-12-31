@@ -1,31 +1,37 @@
 "use client"
 import { useEffect, useState } from "react"
+import { signIn } from "next-auth/react"  // <--- ADICIONE ISSO
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { ShieldCheck, Zap, Lock, Server } from "lucide-react"
-import { signIn } from "next-auth/react";
 
 export default function HomePage() {
-  const [isLoading, setIsLoading] = useState(true)
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
+    const [isLoggedIn, setIsLoggedIn] = useState(false)
 
-  useEffect(() => {
-    fetch("/api/auth/check")
-      .then((res) => res.json())
-      .then((data) => {
-        setIsLoggedIn(data.authenticated)
-        setIsLoading(false)
-      })
-      .catch(() => setIsLoading(false))
-  }, [])
+    // Se quiser manter o check (mas não é obrigatório), mude pra /api/auth/session do NextAuth
+    // Ou simplesmente remova o useEffect todo pra simplificar
 
-  const handleLoginClick = () => {
-    if (isLoggedIn) {
-      window.location.href = "/dashboard";
-    } else {
-      signIn("discord", { callbackUrl: "/dashboard" });  // Inicia login oficial e vai direto pro dashboard após autorizar
+    useEffect(() => {
+      fetch("/api/auth/session")  // <--- Rota oficial do NextAuth
+        .then((res) => res.json())
+        .then((data) => {
+          setIsLoggedIn(!!data.user)
+          setIsLoading(false)
+        })
+        .catch(() => setIsLoading(false))
+    }, [])
+
+    const handleLoginClick = () => {
+      if (isLoggedIn) {
+        window.location.href = "/dashboard"
+      } else {
+        signIn("discord", { callbackUrl: "/dashboard" })  // <--- FLUXO OFICIAL
+      }
     }
-  };
+
+    // ... resto do return igual (botões com onClick={handleLoginClick})
+  }
 
   return (
     <div className="min-h-screen bg-background">
