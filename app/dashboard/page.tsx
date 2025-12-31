@@ -97,12 +97,15 @@ export default async function DashboardPage() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold">Minhas Licenças</h2>
-            <Button asChild className="gap-2">
-              <a href="/dashboard/admin">
-                <Plus className="h-4 w-4" />
-                Nova Licença
-              </a>
-            </Button>
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold">Minhas Licenças</h2>
+              <Button asChild>
+                <Link href="/dashboard/admin">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Nova Licença
+                </Link>
+              </Button>
+            </div>
           </div>
 
           {licenses.length === 0 ? (
