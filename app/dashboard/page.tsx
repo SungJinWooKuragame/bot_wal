@@ -1,10 +1,11 @@
-import { requireAuth } from "@/lib/auth"
-import { queryDb } from "@/lib/db"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/app/api/auth/[...nextauth]/route"  // Caminho pro seu authOptions
+import { redirect } from "next/navigation"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ShieldCheck, Server, Activity, AlertCircle } from "lucide-react"
 import { LicenseCard } from "@/components/license-card"
-import { redirect } from "next/navigation"
+import { queryDb } from "@/lib/db"  // Mantém sua função de query pro MySQL
 
 interface License {
   id: string
@@ -18,16 +19,17 @@ interface License {
 }
 
 export default async function DashboardPage() {
-  let user
-  try {
-    user = await requireAuth()
-  } catch {
-    redirect("/api/auth/discord")
+  const session = await getServerSession(authOptions)
+
+  if (!session?.user) {
+    redirect("/api/auth/signin?callbackUrl=/dashboard")  // Redireciona pro login oficial do NextAuth
   }
 
-  const licenses = await queryDb<License>("SELECT * FROM licenses WHERE user_id = ? ORDER BY created_at DESC", [
-    user.id,
-  ])
+  // Busca as licenças do usuário (ajuste o campo user_id conforme sua tabela – provavelmente discord_id ou um id próprio)
+  const licenses = await queryDb<License>(
+    "SELECT * FROM licenses WHERE user_id = ? ORDER BY created_at DESC",
+    [session.user.id]  // Usa o ID do Discord (sub do token)
+  )
 
   const activeLicenses = licenses.filter((l) => l.status === "active").length
   const totalLicenses = licenses.length
@@ -42,7 +44,7 @@ export default async function DashboardPage() {
             <span className="font-bold text-xl">Dashboard</span>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground">{user.discord_username}</span>
+            <span className="text-sm text-muted-foreground">{session.user.name || session.user.email}</span>
             <Button variant="outline" size="sm">
               Sair
             </Button>

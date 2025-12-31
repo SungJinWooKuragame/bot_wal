@@ -1,29 +1,34 @@
-import { requireAuth } from "@/lib/auth"
-import { queryDb } from "@/lib/db"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/app/api/auth/[...nextauth]/route"  // Caminho pro seu authOptions
+import { redirect } from "next/navigation"
 import { Card } from "@/components/ui/card"
 import { ShieldCheck, Plus } from "lucide-react"
-import { redirect } from "next/navigation"
 import { CreateLicenseForm } from "@/components/create-license-form"
+import { queryDb } from "@/lib/db"  // Mantém sua função de query (assumindo que funciona com MySQL)
 
 // Esta página é só para admin criar licenças
 export default async function AdminPage() {
-  let user
-  try {
-    user = await requireAuth()
-  } catch {
-    redirect("/auth/discord")
+  const session = await getServerSession(authOptions)
+
+  if (!session?.user) {
+    redirect("/api/auth/signin?callbackUrl=/dashboard/admin")  // Redireciona pro login oficial
   }
 
-  // Verificar se é admin (você deve adicionar uma coluna is_admin na tabela users)
-  const [adminCheck] = await queryDb<{ is_admin: boolean }>("SELECT is_admin FROM users WHERE id = ?", [user.id])
+  // Busca o usuário no banco pra checar se é admin (baseado no email ou id do Discord)
+  // Ajuste conforme sua tabela users (ex: coluna discord_id ou email)
+  const [userRecord] = await queryDb<{ is_admin: boolean }>(
+    "SELECT is_admin FROM users WHERE discord_id = ? OR email = ?",
+    [session.user.id, session.user.email]
+  )
 
-  if (!adminCheck?.is_admin) {
-    redirect("/dashboard")
+  if (!userRecord?.is_admin) {
+    redirect("/dashboard")  // Ou pra home se preferir
   }
 
+  // Queries pras stats
   const totalLicenses = await queryDb<{ count: number }>("SELECT COUNT(*) as count FROM licenses")
   const activeLicenses = await queryDb<{ count: number }>(
-    "SELECT COUNT(*) as count FROM licenses WHERE status = 'active'",
+    "SELECT COUNT(*) as count FROM licenses WHERE status = 'active'"
   )
 
   return (
