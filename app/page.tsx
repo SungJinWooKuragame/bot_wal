@@ -1,7 +1,7 @@
+"use client"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { ShieldCheck, Zap, Lock, Server } from "lucide-react"
-import Link from "next/link"
 
 export default function HomePage() {
   return (
@@ -13,9 +13,7 @@ export default function HomePage() {
             <ShieldCheck className="h-6 w-6 text-primary" />
             <span className="font-bold text-xl">FiveM WL Bot</span>
           </div>
-          <Link href="/api/auth/discord">
-            <Button>Acessar Dashboard</Button>
-          </Link>
+          <Button onClick={() => (window.location.href = "/api/auth/discord")}>Acessar Dashboard</Button>
         </div>
       </header>
 
@@ -29,13 +27,11 @@ export default function HomePage() {
             Gerencie a whitelist da sua cidade FiveM com segurança, controle total e sistema de licenças moderno.
           </p>
           <div className="flex gap-4 justify-center pt-4">
-            <Link href="/api/auth/discord">
-              <Button size="lg" className="gap-2">
-                <ShieldCheck className="h-5 w-5" />
-                Começar Agora
-              </Button>
-            </Link>
-            <Button size="lg" variant="outline">
+            <Button size="lg" className="gap-2" onClick={() => (window.location.href = "/api/auth/discord")}>
+              <ShieldCheck className="h-5 w-5" />
+              Começar Agora
+            </Button>
+            <Button size="lg" variant="outline" onClick={() => (window.location.href = "/api/auth/discord")}>
               Ver Planos
             </Button>
           </div>
