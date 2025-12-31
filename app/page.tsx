@@ -13,7 +13,7 @@ export default function HomePage() {
             <ShieldCheck className="h-6 w-6 text-primary" />
             <span className="font-bold text-xl">FiveM WL Bot</span>
           </div>
-          <Link href="/auth/discord">
+          <Link href="/api/auth/discord">
             <Button>Acessar Dashboard</Button>
           </Link>
         </div>
@@ -29,7 +29,7 @@ export default function HomePage() {
             Gerencie a whitelist da sua cidade FiveM com segurança, controle total e sistema de licenças moderno.
           </p>
           <div className="flex gap-4 justify-center pt-4">
-            <Link href="/auth/discord">
+            <Link href="/api/auth/discord">
               <Button size="lg" className="gap-2">
                 <ShieldCheck className="h-5 w-5" />
                 Começar Agora
