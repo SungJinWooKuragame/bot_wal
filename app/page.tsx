@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { ShieldCheck, Zap, Lock, Server } from "lucide-react"
+import { signIn } from "next-auth/react";
 
 export default function HomePage() {
   const [isLoading, setIsLoading] = useState(true)
@@ -20,11 +21,11 @@ export default function HomePage() {
 
   const handleLoginClick = () => {
     if (isLoggedIn) {
-      window.location.href = "/dashboard"
+      window.location.href = "/dashboard";
     } else {
-      window.location.href = "/api/auth/discord"
+      signIn("discord", { callbackUrl: "/dashboard" });  // <--- ISSO RESOLVE!
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-background">
