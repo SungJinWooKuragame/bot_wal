@@ -97,7 +97,9 @@ export default async function DashboardPage() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold">Minhas Licenças</h2>
-            <Button>Nova Licença</Button>
+            <Button asChild>
+              <a href="/dashboard/admin">Nova Licença</a>
+            </Button>
           </div>
 
           {licenses.length === 0 ? (
