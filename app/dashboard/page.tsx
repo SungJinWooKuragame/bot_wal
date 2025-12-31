@@ -25,14 +25,25 @@ export default async function DashboardPage() {
     redirect("/api/auth/signin?callbackUrl=/dashboard")
   }
 
-  // Busca licenças usando o ID do Discord
-  const licenses: License[] = await queryDb(
-    "SELECT * FROM licenses WHERE user_id = ? ORDER BY created_at DESC",
-    [session.user.id]
-  )
+  let licenses: License[] = []
+  let activeLicenses = 0
+  let totalLicenses = 0
 
-  const activeLicenses = licenses.filter((l) => l.status === "active").length
-  const totalLicenses = licenses.length
+  try {
+    licenses = await queryDb<License>(
+      "SELECT * FROM licenses WHERE user_id = ? ORDER BY created_at DESC",
+      [session.user.id]
+    )
+
+    activeLicenses = licenses.filter((l) => l.status === "active").length
+    totalLicenses = licenses.length
+  } catch (error) {
+    console.error("Erro ao buscar licenças:", error)
+    // Não crasha o server – mostra fallback
+    licenses = []
+    activeLicenses = 0
+    totalLicenses = 0
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -45,7 +56,7 @@ export default async function DashboardPage() {
           </div>
           <div className="flex items-center gap-4">
             <span className="text-sm text-muted-foreground">
-              {session.user.name}
+              {session.user.name || "Usuário"}
             </span>
             <Button variant="outline" size="sm">
               Sair
