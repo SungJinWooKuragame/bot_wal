@@ -3,7 +3,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { redirect } from "next/navigation"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ShieldCheck, Server, Activity, AlertCircle } from "lucide-react"
+import { ShieldCheck, Server, Activity, AlertCircle, Plus } from "lucide-react"
 import { LicenseCard } from "@/components/license-card"
 import { queryDb } from "@/lib/db"
 
@@ -38,8 +38,8 @@ export default async function DashboardPage() {
     activeLicenses = licenses.filter((l) => l.status === "active").length
     totalLicenses = licenses.length
   } catch (error) {
-    console.error("Erro ao buscar licenças:", error)
-    // Não crasha o server – mostra fallback
+    console.error("Erro ao buscar licenças (não crasha mais):", error)
+    // Fallback seguro – mostra dashboard vazio sem crashar o server
     licenses = []
     activeLicenses = 0
     totalLicenses = 0
