@@ -7,6 +7,7 @@ import { ShieldCheck, Server, Activity, AlertCircle, Plus } from "lucide-react"
 import { LicenseCard } from "@/components/license-card"
 import { redirect } from "next/navigation"
 import Link from "next/link"
+import { revalidateTag } from "next/cache"
 
 interface License {
   id: string
@@ -18,6 +19,8 @@ interface License {
   expires_at: string | null
   created_at: string
 }
+
+export const revalidate = 0 // Sem cache - sempre fresh
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions)

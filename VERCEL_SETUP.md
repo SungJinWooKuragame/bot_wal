@@ -53,26 +53,26 @@ Após adicionar TODAS as variáveis, vá em:
 Acesse: https://discord.com/developers/applications/1455112417456554014/oauth2
 
 Em **Redirects**, adicione:
-```
+\`\`\`
 https://bot-wal.vercel.app/api/auth/callback
-```
+\`\`\`
 
 Clique em "Save Changes"
 
 ## 5. Verificar Configuração
 
 Após o redeploy, acesse:
-```
+\`\`\`
 https://bot-wal.vercel.app/api/check-env
-```
+\`\`\`
 
 Deve mostrar todas as variáveis como `true`
 
 ## 6. Testar Login
 
 Agora acesse:
-```
+\`\`\`
 https://bot-wal.vercel.app
-```
+\`\`\`
 
 Clique em "Acessar Dashboard" e faça login com Discord

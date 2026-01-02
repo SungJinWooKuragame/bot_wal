@@ -48,22 +48,22 @@
 
 ## Variáveis de ambiente necessárias:
 
-```
+\`\`\`
 DISCORD_CLIENT_ID=1455112417456554014
 DISCORD_CLIENT_SECRET=PQsaRHR5DH9jzp9LQMObXl6x3drgpstI
 NEXTAUTH_URL=https://bot-wal.vercel.app
 NEXTAUTH_SECRET=NEXVO_A_MELHOR_LOJA
 DATABASE_URL=mysql://WLbot:2006@45.146.81.87:3306/nexvo_bot_wl
 BOT_API_SECRET=5e3709c45ff97ac192107af871d00f201a2fe7a17e70f9444348ba19da836687
-```
+\`\`\`
 
 ## Para virar admin:
 
 Após fazer login uma vez, rode no HeidiSQL:
 
-```sql
+\`\`\`sql
 UPDATE users SET is_admin = 1 WHERE discord_id = 'SEU_DISCORD_ID';
-```
+\`\`\`
 
 ## Pronto!
 

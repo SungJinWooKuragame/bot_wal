@@ -96,6 +96,8 @@ export const authOptions: NextAuthOptions = {
   },
   session: {
     strategy: "jwt",
+    maxAge: 60, // 1 minuto - força revalidação frequente
+    updateAge: 0, // Sempre atualizar sessão
   },
 }
 

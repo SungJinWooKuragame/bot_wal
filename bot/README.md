@@ -12,7 +12,7 @@ Bot modernizado de whitelist para servidores FiveM com sistema de licenciamento.
 
 ### 2. Configurar o Bot
 
-```bash
+\`\`\`bash
 # 1. Fazer upload dos arquivos para a VPS
 cd /root
 mkdir fivem-wl-bot
@@ -29,7 +29,7 @@ nano .env
 # - DISCORD_TOKEN: Token do bot (Discord Developer Portal)
 # - LICENSE_KEY: Chave fornecida no dashboard
 # - API_URL: URL do seu dashboard (ex: https://seu-bot.vercel.app)
-```
+\`\`\`
 
 ### 3. Obter Token do Discord
 
@@ -46,13 +46,13 @@ nano .env
 
 Use o link gerado no dashboard ou crie um manualmente:
 
-```
+\`\`\`
 https://discord.com/api/oauth2/authorize?client_id=SEU_CLIENT_ID&permissions=268445760&scope=bot%20applications.commands
-```
+\`\`\`
 
 ### 5. Executar o Bot
 
-```bash
+\`\`\`bash
 # Teste
 node index.js
 
@@ -61,7 +61,7 @@ npm install -g pm2
 pm2 start index.js --name fivem-wl-bot
 pm2 save
 pm2 startup
-```
+\`\`\`
 
 ## Comandos
 
@@ -94,7 +94,7 @@ Em caso de problemas:
 
 O bot verifica automaticamente por atualizações. Para atualizar manualmente:
 
-```bash
+\`\`\`bash
 git pull
 npm install
 pm2 restart fivem-wl-bot

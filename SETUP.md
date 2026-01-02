@@ -26,9 +26,9 @@
 
 No HeidiSQL ou phpMyAdmin, crie um novo banco de dados:
 
-```sql
+\`\`\`sql
 CREATE DATABASE fivem_wl_bot CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-```
+\`\`\`
 
 ### 2. Executar Scripts SQL
 
@@ -41,9 +41,9 @@ Execute os scripts na ordem:
 
 Após fazer login pela primeira vez no dashboard, execute:
 
-```sql
+\`\`\`sql
 UPDATE users SET is_admin = TRUE WHERE discord_id = 'SEU_DISCORD_ID';
-```
+\`\`\`
 
 ---
 
@@ -60,7 +60,7 @@ UPDATE users SET is_admin = TRUE WHERE discord_id = 'SEU_DISCORD_ID';
 
 No Vercel, adicione as seguintes variáveis:
 
-```env
+\`\`\`env
 # Database
 DB_HOST=seu-host-mysql.com
 DB_PORT=3306
@@ -72,7 +72,7 @@ DB_NAME=fivem_wl_bot
 DISCORD_CLIENT_ID=seu_client_id
 DISCORD_CLIENT_SECRET=seu_client_secret
 DISCORD_REDIRECT_URI=https://seu-dashboard.vercel.app/api/auth/callback
-```
+\`\`\`
 
 ### 3. Obter Credenciais Discord
 
@@ -105,7 +105,7 @@ DISCORD_REDIRECT_URI=https://seu-dashboard.vercel.app/api/auth/callback
 
 ### 2. Preparar VPS
 
-```bash
+\`\`\`bash
 # Conectar na VPS
 ssh root@seu-ip
 
@@ -119,7 +119,7 @@ npm install -g pm2
 # Criar diretório do bot
 mkdir /root/fivem-wl-bot
 cd /root/fivem-wl-bot
-```
+\`\`\`
 
 ### 3. Upload dos Arquivos
 
@@ -127,7 +127,7 @@ Faça upload dos arquivos da pasta `bot/` para `/root/fivem-wl-bot`
 
 ### 4. Configurar Bot
 
-```bash
+\`\`\`bash
 # Criar arquivo .env
 nano .env
 
@@ -137,11 +137,11 @@ LICENSE_KEY=sua_chave_de_licenca
 API_URL=https://seu-dashboard.vercel.app
 
 # Salvar: Ctrl+O, Enter, Ctrl+X
-```
+\`\`\`
 
 ### 5. Instalar e Executar
 
-```bash
+\`\`\`bash
 # Instalar dependências
 npm install
 
@@ -152,7 +152,7 @@ node index.js
 pm2 start index.js --name fivem-wl-bot
 pm2 save
 pm2 startup
-```
+\`\`\`
 
 ---
 

@@ -47,7 +47,7 @@ Sistema de bot Discord para whitelist de servidor FiveM com dashboard web e sist
 - `scripts/002-add-admin-column.sql` - Adicionar admin
 
 ## VARIÁVEIS AMBIENTE (Vercel)
-```
+\`\`\`
 DATABASE_URL=mysql://WLbot:2006@45.146.81.87:3306/nexvo_bot_wl
 DISCORD_CLIENT_ID=1455112417456554014
 DISCORD_CLIENT_SECRET=PQsaRHR5DH9jzp9LQMObXl6x3drgpstI
@@ -55,7 +55,7 @@ DISCORD_REDIRECT_URI=https://bot-wal.vercel.app/api/auth/callback
 NEXTAUTH_SECRET=NEXVO_A_MELHOR_LOJA
 NEXTAUTH_URL=https://bot-wal.vercel.app
 BOT_API_SECRET=5e3709c45ff97ac192107af871d00f201a2fe7a17e70f9444348ba19da836687
-```
+\`\`\`
 
 ## PROBLEMAS ATUAIS
 1. Erro CORS ao clicar em botões - CORRIGIDO (usando window.location)
