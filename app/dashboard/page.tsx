@@ -26,6 +26,11 @@ export default async function DashboardPage() {
     redirect("/api/auth/signin?callbackUrl=/dashboard")
   }
 
+  // Se for admin, redireciona para painel de admin
+  if (session.user.isAdmin) {
+    redirect("/dashboard/admin")
+  }
+
   let licenses: License[] = []
   try {
     licenses = await queryDb<License>("SELECT * FROM licenses WHERE user_id = ? ORDER BY created_at DESC", [
@@ -107,7 +112,19 @@ export default async function DashboardPage() {
             <Card className="p-12 text-center space-y-4">
               <ShieldCheck className="h-12 w-12 mx-auto text-muted-foreground" />
               <h3 className="text-xl font-semibold">Nenhuma licença encontrada</h3>
-              <p className="text-muted-foreground">Entre em contato para adquirir sua primeira licença</p>
+              <p className="text-muted-foreground">
+                {session.user.isAdmin
+                  ? "Acesse o painel admin para criar novas licenças"
+                  : "Entre em contato para adquirir sua primeira licença"}
+              </p>
+              {session.user.isAdmin && (
+                <Button size="lg" asChild className="mt-4">
+                  <Link href="/dashboard/admin">
+                    <Plus className="h-5 w-5 mr-2" />
+                    Criar Nova Licença
+                  </Link>
+                </Button>
+              )}
             </Card>
           ) : (
             <div className="grid gap-4">
