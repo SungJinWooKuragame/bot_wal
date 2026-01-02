@@ -4,14 +4,14 @@ import mysql from "mysql2/promise"
 let pool: mysql.Pool | null = null
 
 function parseDatabaseUrl(url: string) {
-  // Format: mysql://user:password@host:port/database
-  const match = url.match(/mysql:\/\/([^:]+):([^@]+)@([^:]+):(\d+)\/(.+)/)
+  // Format: mysql://user:password@host:port/database ou mysql://user@host:port/database
+  const match = url.match(/mysql:\/\/([^:@]+)(?::([^@]*))?@([^:]+):(\d+)\/(.+)/)
   if (!match) {
     throw new Error("Invalid DATABASE_URL format")
   }
   return {
     user: match[1],
-    password: match[2],
+    password: match[2] || "", // Senha pode ser vazia
     host: match[3],
     port: Number.parseInt(match[4]),
     database: match[5],
