@@ -9,11 +9,14 @@ import { CreateLicenseForm } from "@/components/create-license-form"
 export default async function AdminPage() {
   const session = await getServerSession(authOptions)
 
+  console.log("[v0] Admin page - Session:", session?.user)
+
   if (!session?.user) {
     redirect("/api/auth/signin?callbackUrl=/dashboard/admin")
   }
 
   if (!session.user.isAdmin) {
+    console.log("[v0] Access denied - User is not admin")
     redirect("/dashboard")
   }
 

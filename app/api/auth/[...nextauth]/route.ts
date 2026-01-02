@@ -50,7 +50,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (session.user) {
         // Buscar ID do banco de dados
-        const [user] = await queryDb<{ id: string; discord_username: string; is_admin: boolean }>(
+        const [user] = await queryDb<{ id: string; discord_username: string; is_admin: number }>(
           "SELECT id, discord_username, is_admin FROM users WHERE discord_id = ?",
           [token.discordId as string],
         )
@@ -59,7 +59,8 @@ export const authOptions: NextAuthOptions = {
           session.user.id = user.id
           session.user.discordId = token.discordId as string
           session.user.discord_username = user.discord_username
-          session.user.isAdmin = user.is_admin
+          session.user.isAdmin = user.is_admin === 1
+          console.log("[v0] User session:", { discordId: token.discordId, isAdmin: session.user.isAdmin })
         }
       }
       return session
