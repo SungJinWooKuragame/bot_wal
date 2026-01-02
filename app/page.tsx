@@ -1,27 +1,13 @@
 "use client"
-
-import { useEffect, useState } from "react"
-import { signIn } from "next-auth/react"
+import { signIn, useSession } from "next-auth/react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { ShieldCheck, Zap, Lock, Server } from "lucide-react"
 
 export default function HomePage() {
-  const [isLoading, setIsLoading] = useState(true)
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-
-  // Verifica se o usuário já está logado usando a rota oficial do NextAuth
-  useEffect(() => {
-    fetch("/api/auth/session")
-      .then((res) => res.json())
-      .then((data) => {
-        setIsLoggedIn(!!data.user)
-        setIsLoading(false)
-      })
-      .catch(() => {
-        setIsLoading(false)
-      })
-  }, [])
+  const { data: session, status } = useSession()
+  const isLoading = status === "loading"
+  const isLoggedIn = !!session
 
   const handleLoginClick = () => {
     if (isLoggedIn) {

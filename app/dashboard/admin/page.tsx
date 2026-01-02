@@ -1,10 +1,10 @@
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
-import { redirect } from "next/navigation"
+import { queryDb } from "@/lib/db"
 import { Card } from "@/components/ui/card"
 import { ShieldCheck, Plus } from "lucide-react"
+import { redirect } from "next/navigation"
 import { CreateLicenseForm } from "@/components/create-license-form"
-import { queryDb } from "@/lib/db"
 
 export default async function AdminPage() {
   const session = await getServerSession(authOptions)
@@ -13,36 +13,20 @@ export default async function AdminPage() {
     redirect("/api/auth/signin?callbackUrl=/dashboard/admin")
   }
 
-  // Check se é admin (busca no banco pelo discord_id)
-  let isAdmin = false
+  if (!session.user.isAdmin) {
+    redirect("/dashboard")
+  }
+
   let totalLicenses = 0
   let activeLicenses = 0
 
   try {
-    const [userRecord] = await queryDb<{ is_admin: number }>(
-      "SELECT is_admin FROM users WHERE discord_id = ?",
-      [session.user.id]
-    )
-
-    if (userRecord?.is_admin === 1) {
-      isAdmin = true
-
-      // Stats admin
-      const total = await queryDb<{ count: number }>("SELECT COUNT(*) as count FROM licenses")
-      const active = await queryDb<{ count: number }>(
-        "SELECT COUNT(*) as count FROM licenses WHERE status = 'active'"
-      )
-
-      totalLicenses = total[0]?.count || 0
-      activeLicenses = active[0]?.count || 0
-    }
+    const [total] = await queryDb<{ count: number }>("SELECT COUNT(*) as count FROM licenses")
+    const [active] = await queryDb<{ count: number }>("SELECT COUNT(*) as count FROM licenses WHERE status = 'active'")
+    totalLicenses = total?.count || 0
+    activeLicenses = active?.count || 0
   } catch (error) {
-    console.error("Erro no check admin ou stats:", error)
-    // Não crasha – continua com isAdmin = false
-  }
-
-  if (!isAdmin) {
-    redirect("/dashboard")  // Volta pro dashboard normal
+    console.error("[v0] Error fetching stats:", error)
   }
 
   return (
@@ -53,7 +37,6 @@ export default async function AdminPage() {
             <ShieldCheck className="h-6 w-6 text-primary" />
             <span className="font-bold text-xl">Admin Panel</span>
           </div>
-          <span className="text-sm text-muted-foreground">{session.user.name}</span>
         </div>
       </header>
 

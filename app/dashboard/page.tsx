@@ -1,11 +1,12 @@
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/app/api/auth/[...nextauth]/route"
-import { redirect } from "next/navigation"
+import { queryDb } from "@/lib/db"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ShieldCheck, Server, Activity, AlertCircle, Plus } from "lucide-react"
 import { LicenseCard } from "@/components/license-card"
-import { queryDb } from "@/lib/db"
+import { redirect } from "next/navigation"
+import Link from "next/link"
 
 interface License {
   id: string
@@ -26,24 +27,16 @@ export default async function DashboardPage() {
   }
 
   let licenses: License[] = []
-  let activeLicenses = 0
-  let totalLicenses = 0
-
   try {
-    licenses = await queryDb<License>(
-      "SELECT * FROM licenses WHERE user_id = ? ORDER BY created_at DESC",
-      [session.user.id]
-    )
-
-    activeLicenses = licenses.filter((l) => l.status === "active").length
-    totalLicenses = licenses.length
+    licenses = await queryDb<License>("SELECT * FROM licenses WHERE user_id = ? ORDER BY created_at DESC", [
+      session.user.id,
+    ])
   } catch (error) {
-    console.error("Erro ao buscar licenças (não crasha mais):", error)
-    // Fallback seguro – mostra dashboard vazio sem crashar o server
-    licenses = []
-    activeLicenses = 0
-    totalLicenses = 0
+    console.error("[v0] Error fetching licenses:", error)
   }
+
+  const activeLicenses = licenses.filter((l) => l.status === "active").length
+  const totalLicenses = licenses.length
 
   return (
     <div className="min-h-screen bg-background">
@@ -55,11 +48,14 @@ export default async function DashboardPage() {
             <span className="font-bold text-xl">Dashboard</span>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground">
-              {session.user.name || "Usuário"}
-            </span>
-            <Button variant="outline" size="sm">
-              Sair
+            <span className="text-sm text-muted-foreground">{session.user.discord_username}</span>
+            {session.user.isAdmin && (
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/dashboard/admin">Admin</Link>
+              </Button>
+            )}
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/api/auth/signout">Sair</Link>
             </Button>
           </div>
         </div>
@@ -97,22 +93,21 @@ export default async function DashboardPage() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold">Minhas Licenças</h2>
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold">Minhas Licenças</h2>
+            {session.user.isAdmin && (
               <Button asChild>
                 <Link href="/dashboard/admin">
                   <Plus className="h-4 w-4 mr-2" />
                   Nova Licença
                 </Link>
               </Button>
-            </div>
+            )}
           </div>
 
           {licenses.length === 0 ? (
             <Card className="p-12 text-center space-y-4">
               <ShieldCheck className="h-12 w-12 mx-auto text-muted-foreground" />
               <h3 className="text-xl font-semibold">Nenhuma licença encontrada</h3>
-              <p className="text-muted-foreground">Compre sua licença para aparecer aqui!</p>
+              <p className="text-muted-foreground">Entre em contato para adquirir sua primeira licença</p>
             </Card>
           ) : (
             <div className="grid gap-4">
