@@ -8,6 +8,7 @@ import Link from "next/link"
 import { notFound, redirect } from "next/navigation"
 import { ConfigureVPSForm } from "@/components/configure-vps-form"
 import { BotConfigForm } from "@/components/bot-config-form"
+import { LicenseQuestionsForm } from "@/components/license-questions-form"
 
 interface License {
   id: string
@@ -180,6 +181,15 @@ export default async function LicenseDetailPage({ params }: { params: Promise<{ 
         <Card className="p-6 space-y-6">
           <h2 className="text-xl font-bold">Configuração do Bot</h2>
           <BotConfigForm licenseId={license.id} config={botConfig} />
+        </Card>
+
+        {/* Whitelist Questions */}
+        <Card className="p-6 space-y-6">
+          <h2 className="text-xl font-bold">Questões de Whitelist</h2>
+          <p className="text-muted-foreground">
+            Customize as perguntas que os usuários precisam responder para entrar no servidor.
+          </p>
+          <LicenseQuestionsForm licenseId={license.id} />
         </Card>
 
         {/* Download Section */}
