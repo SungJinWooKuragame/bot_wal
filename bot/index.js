@@ -148,6 +148,61 @@ async function getVpsIp() {
 
 async function validateLicense() {
   try {
+    console.log("[BOT] Validando licença...")
+    
+    if (!vpsIp) {
+      vpsIp = await getVpsIp()
+    }
+
+    if (!vpsIp) {
+      console.error("[BOT] ❌ Erro: Não foi possível obter IP da VPS")
+      return false
+    }
+
+    const response = await fetch(`${API_URL}/api/bot/validate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        licenseKey: LICENSE_KEY,
+        vpsIp: vpsIp,
+        botVersion: BOT_VERSION,
+      }),
+    })
+
+    if (!response.ok) {
+      const data = await response.json()
+      console.error("[BOT] ❌ Validação falhou:", data.error || "Erro desconhecido")
+      console.error("[BOT] 🔗 Configure sua licença em:", API_URL)
+      return false
+    }
+
+    const data = await response.json()
+
+    if (!data.valid) {
+      console.error("[BOT] ❌ Licença inválida:", data.error || "Motivo desconhecido")
+      return false
+    }
+
+    botConfig = data.config
+    isAuthenticated = true
+
+    console.log("[BOT] ✅ Licença validada com sucesso!")
+    console.log("[BOT] 📊 Status:", data.license.status)
+    console.log("[BOT] 📦 Plano:", data.license.plan_type)
+    console.log("[BOT] 🌐 VPS IP:", vpsIp)
+
+    // Validar se há configuração
+    if (!botConfig.guild_id) {
+      console.warn("[BOT] ⚠️  Bot não está configurado! Acesse o dashboard para configurar.")
+      console.warn("[BOT] 🔗 Dashboard:", API_URL)
+    }
+
+    return true
+  } catch (error) {
+    console.error("[BOT] ❌ Erro ao validar licença:", error.message)
+    return false
+  }
+}
     vpsIp = await getVpsIp()
     if (!vpsIp) {
       console.error("[BOT] Não foi possível obter o IP da VPS")
@@ -185,10 +240,13 @@ async function validateLicense() {
 }
 
 async function sendHeartbeat() {
-  if (!isAuthenticated) return
+  if (!isAuthenticated) {
+    console.log("[BOT] Heartbeat ignorado: bot não autenticado")
+    return
+  }
 
   try {
-    await fetch(`${API_URL}/api/bot/heartbeat`, {
+    const response = await fetch(`${API_URL}/api/bot/heartbeat`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -201,8 +259,25 @@ async function sendHeartbeat() {
         },
       }),
     })
+
+    if (!response.ok) {
+      const data = await response.json()
+      console.error("[BOT] ❌ Heartbeat falhou:", data.error)
+
+      // Se shouldStop=true, significa que a licença foi suspensa/expirada
+      if (data.shouldStop) {
+        console.error("[BOT] 🛑 Licença inválida! Bot será encerrado.")
+        console.error("[BOT] 🔗 Verifique sua licença em:", API_URL)
+        process.exit(1)
+      }
+      return
+    }
+
+    const data = await response.json()
+    console.log("[BOT] 💓 Heartbeat enviado:", data.timestamp)
   } catch (error) {
-    console.error("[BOT] Erro ao enviar heartbeat:", error)
+    console.error("[BOT] ⚠️  Erro ao enviar heartbeat:", error.message)
+    // Não encerra o bot em caso de erro de rede temporário
   }
 }
 
