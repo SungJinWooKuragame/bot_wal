@@ -3,7 +3,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route"
 import { queryDb } from "@/lib/db"
 import { NextResponse } from "next/server"
 
-export async function POST(request: Request, { params }: { params: { id: string } }) {
+export async function POST(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getServerSession(authOptions)
 
@@ -11,7 +11,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
       return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 403 })
     }
 
-    const { id } = params
+    const { id } = await params
     const { action } = await request.json()
 
     // Validar action

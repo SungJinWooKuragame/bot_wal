@@ -43,13 +43,13 @@ export async function POST(request: NextRequest) {
       [
         randomUUID(),
         licenseId,
-        guildId || null,
-        whitelistRoleId || null,
-        logChannelId || null,
-        acceptChannelId || null,
-        reproveChannelId || null,
-        embedColor || "#0099ff",
-        welcomeMessage || null,
+        guildId ?? null,
+        whitelistRoleId ?? null,
+        logChannelId ?? null,
+        acceptChannelId ?? null,
+        reproveChannelId ?? null,
+        embedColor ?? "#0099ff",
+        welcomeMessage ?? null,
       ],
     )
 
