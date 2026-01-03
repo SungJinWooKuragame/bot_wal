@@ -130,11 +130,10 @@ export function LicenseQuestionsForm({ licenseId }: LicenseQuestionsFormProps) {
     const newQuestions = [...questions]
     const targetIndex = direction === "up" ? index - 1 : index + 1
     
-    // Swap
-    [newQuestions[index].sequence, newQuestions[targetIndex].sequence] = [
-      newQuestions[targetIndex].sequence,
-      newQuestions[index].sequence,
-    ]
+    // Swap usando temp variable (Turbopack compatível)
+    const tempSequence = newQuestions[index].sequence
+    newQuestions[index].sequence = newQuestions[targetIndex].sequence
+    newQuestions[targetIndex].sequence = tempSequence
 
     try {
       setLoading(true)
