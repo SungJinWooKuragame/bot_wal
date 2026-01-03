@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Save } from "lucide-react"
+import { Save, CheckCircle, XCircle, AlertCircle } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 interface BotConfig {
   guild_id: string | null
@@ -20,6 +21,7 @@ interface BotConfig {
 }
 
 export function BotConfigForm({ licenseId, config }: { licenseId: string; config?: BotConfig }) {
+  const router = useRouter()
   const [formData, setFormData] = useState({
     guildId: config?.guild_id || "",
     whitelistRoleId: config?.whitelist_role_id || "",
@@ -30,10 +32,12 @@ export function BotConfigForm({ licenseId, config }: { licenseId: string; config
     welcomeMessage: config?.welcome_message || "",
   })
   const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
+    setMessage(null)
 
     try {
       const response = await fetch("/api/licenses/configure-bot", {
@@ -42,14 +46,17 @@ export function BotConfigForm({ licenseId, config }: { licenseId: string; config
         body: JSON.stringify({ licenseId, ...formData }),
       })
 
+      const data = await response.json()
+
       if (response.ok) {
-        alert("Configurações salvas com sucesso!")
+        setMessage({ type: "success", text: "Configurações salvas com sucesso!" })
+        router.refresh()
       } else {
-        alert("Erro ao salvar configurações")
+        setMessage({ type: "error", text: data.message || "Erro ao salvar configurações" })
       }
     } catch (error) {
-      console.error("[v0] Error saving config:", error)
-      alert("Erro ao salvar configurações")
+      console.error("[Bot Config] Error saving config:", error)
+      setMessage({ type: "error", text: "Erro de conexão ao salvar configurações" })
     } finally {
       setLoading(false)
     }
@@ -57,24 +64,59 @@ export function BotConfigForm({ licenseId, config }: { licenseId: string; config
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {message && (
+        <div
+          className={`p-4 rounded-lg flex items-center gap-2 ${
+            message.type === "success"
+              ? "bg-accent/10 text-accent border border-accent/20"
+              : "bg-destructive/10 text-destructive border border-destructive/20"
+          }`}
+        >
+          {message.type === "success" ? (
+            <CheckCircle className="h-5 w-5" />
+          ) : (
+            <XCircle className="h-5 w-5" />
+          )}
+          <p>{message.text}</p>
+        </div>
+      )}
+
+      <div className="p-4 bg-muted/50 rounded-lg border border-border flex items-start gap-2">
+        <AlertCircle className="h-5 w-5 text-muted-foreground mt-0.5" />
+        <div className="text-sm text-muted-foreground space-y-1">
+          <p className="font-medium">Como obter os IDs do Discord:</p>
+          <ol className="list-decimal list-inside space-y-1 ml-2">
+            <li>Ative o Modo Desenvolvedor em Configurações → Avançado</li>
+            <li>Clique com botão direito no servidor/canal/cargo</li>
+            <li>Selecione "Copiar ID"</li>
+          </ol>
+        </div>
+      </div>
+
       <div className="grid md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="guild-id">ID do Servidor</Label>
+          <Label htmlFor="guild-id">
+            ID do Servidor <span className="text-destructive">*</span>
+          </Label>
           <Input
             id="guild-id"
             placeholder="123456789012345678"
             value={formData.guildId}
             onChange={(e) => setFormData({ ...formData, guildId: e.target.value })}
+            required
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="role-id">ID do Cargo Whitelist</Label>
+          <Label htmlFor="role-id">
+            ID do Cargo Whitelist <span className="text-destructive">*</span>
+          </Label>
           <Input
             id="role-id"
             placeholder="123456789012345678"
             value={formData.whitelistRoleId}
             onChange={(e) => setFormData({ ...formData, whitelistRoleId: e.target.value })}
+            required
           />
         </div>
 
@@ -132,11 +174,12 @@ export function BotConfigForm({ licenseId, config }: { licenseId: string; config
         <Label htmlFor="welcome-message">Mensagem de Boas-vindas</Label>
         <Textarea
           id="welcome-message"
-          placeholder="Bem-vindo ao servidor! {user}"
+          placeholder="Bem-vindo ao servidor! Use {user} para mencionar o usuário."
           value={formData.welcomeMessage}
           onChange={(e) => setFormData({ ...formData, welcomeMessage: e.target.value })}
           rows={3}
         />
+        <p className="text-xs text-muted-foreground">Variáveis disponíveis: {"{user}"}, {"{server}"}</p>
       </div>
 
       <Button type="submit" className="w-full gap-2" disabled={loading}>
